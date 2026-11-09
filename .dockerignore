@@ -1,0 +1,12 @@
+# Archivos excluidos del contexto de construcción de la imagen.
+# compras.csv se monta en el contenedor en tiempo de ejecución.
+compras.csv
+target/
+.git/
+.github/
+.idea/
+.vscode/
+*.iml
+HELP.md
+README.md
+docker-compose.yml
