@@ -77,6 +77,32 @@ class ComprasControllerTest {
     }
 
     @Test
+    void detalleDeUnaCompra() throws Exception {
+        mockMvc.perform(get("/compras/detalle/3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3))
+                .andExpect(jsonPath("$.producto").value("Escritorio"))
+                .andExpect(jsonPath("$.monto").value(8.0))
+                .andExpect(jsonPath("$.unidad").value("UF"))
+                .andExpect(jsonPath("$.fecha").value("2026-09-04"))
+                .andExpect(jsonPath("$.valor_unidad").value(VALOR_UF))
+                .andExpect(jsonPath("$.monto_pesos").value(320_000));
+    }
+
+    @Test
+    void detalleDeCompraInexistenteResponde404() throws Exception {
+        mockMvc.perform(get("/compras/detalle/99"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail", containsString("99")));
+    }
+
+    @Test
+    void detalleConIdNoNumericoResponde400() throws Exception {
+        mockMvc.perform(get("/compras/detalle/abc"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void apiDeIndicadoresCaidaResponde502() throws Exception {
         when(indicadores.valorEn(eq(Unidad.UF), any())).thenThrow(new IndicadorException("sin conexión"));
         mockMvc.perform(get("/compras/uf"))

@@ -3,8 +3,11 @@ package tareas.isoft.tarea2.service;
 import org.springframework.stereotype.Service;
 import tareas.isoft.tarea2.client.IndicadorClient;
 import tareas.isoft.tarea2.dto.CompraConvertidaDTO;
+import tareas.isoft.tarea2.dto.CompraDetalleDTO;
 import tareas.isoft.tarea2.dto.ComprasPorUnidadDTO;
+import tareas.isoft.tarea2.exceptions.CompraNoEncontradaException;
 import tareas.isoft.tarea2.exceptions.UnidadNoValidaException;
+import tareas.isoft.tarea2.model.Compra;
 import tareas.isoft.tarea2.model.Unidad;
 
 import java.math.BigDecimal;
@@ -51,6 +54,24 @@ public class ComprasService {
 
         long totalPesos = compras.stream().mapToLong(CompraConvertidaDTO::montoPesos).sum();
         return new ComprasPorUnidadDTO(unidad, compras, totalPesos);
+    }
+
+    /**
+     * Obtiene una compra convertida a pesos según su unidad.
+     *
+     * @param id identificador de la compra
+     * @return la compra con el valor de su unidad y su monto en pesos
+     * @throws CompraNoEncontradaException si no existe una compra con ese identificador
+     */
+    public CompraDetalleDTO detalle(int id) {
+        Compra compra = lectorCsv.leerCompras().stream()
+                .filter(c -> c.id() == id)
+                .findFirst()
+                .orElseThrow(() -> new CompraNoEncontradaException(id));
+
+        double valorUnidad = indicadores.valorEn(compra.unidad(), compra.fecha());
+        return new CompraDetalleDTO(compra.id(), compra.producto(), compra.monto(), compra.unidad(), compra.fecha(),
+                valorUnidad, aPesos(compra.monto(), valorUnidad));
     }
 
     /**
