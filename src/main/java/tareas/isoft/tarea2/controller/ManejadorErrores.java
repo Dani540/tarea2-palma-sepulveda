@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tareas.isoft.tarea2.exceptions.CSVReaderException;
+import tareas.isoft.tarea2.exceptions.CompraNoEncontradaException;
 import tareas.isoft.tarea2.exceptions.IndicadorException;
 import tareas.isoft.tarea2.exceptions.UnidadNoValidaException;
 
@@ -22,6 +24,19 @@ public class ManejadorErrores {
     @ExceptionHandler(UnidadNoValidaException.class)
     public ProblemDetail unidadNoValida(UnidadNoValidaException e) {
         return problema(HttpStatus.NOT_FOUND, "Unidad no encontrada", e.getMessage());
+    }
+
+    /** Responde 404 Not Found cuando no existe la compra solicitada. */
+    @ExceptionHandler(CompraNoEncontradaException.class)
+    public ProblemDetail compraNoEncontrada(CompraNoEncontradaException e) {
+        return problema(HttpStatus.NOT_FOUND, "Compra no encontrada", e.getMessage());
+    }
+
+    /** Responde 400 Bad Request cuando un parámetro de la ruta no tiene el tipo esperado. */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ProblemDetail parametroInvalido(MethodArgumentTypeMismatchException e) {
+        return problema(HttpStatus.BAD_REQUEST, "Parámetro inválido",
+                "El valor '" + e.getValue() + "' no es válido para '" + e.getName() + "'; debe ser un número entero");
     }
 
     /** Responde 502 Bad Gateway cuando no se puede obtener el valor de un indicador. */
