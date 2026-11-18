@@ -1,0 +1,15 @@
+# Uso: docker compose up --build
+services:
+  app:
+    build: .
+    image: tarea2:local
+    environment:
+      APP_ENV: production
+      APP_PORT: ${APP_PORT:-3001}
+      CSV_PATH: /data/compras.csv
+    ports:
+      - "${APP_PORT:-3001}:${APP_PORT:-3001}"
+    volumes:
+      # Archivo de compras de la raíz del repositorio, montado en modo de solo lectura.
+      - ./compras.csv:/data/compras.csv:ro
+    restart: unless-stopped
